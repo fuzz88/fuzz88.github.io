@@ -3,6 +3,36 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://oschepkov.ru/series/hugo/</loc>
+    <lastmod>2017-01-08T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://oschepkov.ru/</loc>
+    <lastmod>2017-01-08T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://oschepkov.ru/posts/</loc>
+    <lastmod>2017-01-08T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://oschepkov.ru/series/</loc>
+    <lastmod>2017-01-08T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://oschepkov.ru/series/theme/</loc>
+    <lastmod>2017-01-08T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://oschepkov.ru/posts/theme-demo/</loc>
+    <lastmod>2017-01-08T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://oschepkov.ru/about/</loc>
   </url>
   
@@ -15,15 +45,7 @@
   </url>
   
   <url>
-    <loc>https://oschepkov.ru/</loc>
-  </url>
-  
-  <url>
     <loc>https://oschepkov.ru/projects/</loc>
-  </url>
-  
-  <url>
-    <loc>https://oschepkov.ru/series/</loc>
   </url>
   
   <url>
