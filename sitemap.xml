@@ -3,15 +3,26 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://oschepkov.ru/posts/tic-tac-toe-intro/</loc>
+    <lastmod>2020-10-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://oschepkov.ru/</loc>
+    <lastmod>2020-10-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://oschepkov.ru/posts/</loc>
+    <lastmod>2020-10-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://oschepkov.ru/categories/</loc>
   </url>
   
   <url>
     <loc>https://oschepkov.ru/about/</loc>
-  </url>
-  
-  <url>
-    <loc>https://oschepkov.ru/</loc>
   </url>
   
   <url>
