@@ -1,1 +1,10 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Tags on Ivan's Homepage</title><link>https://oschepkov.ru/tags/</link><description>Recent content in Tags on Ivan's Homepage</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sun, 20 Jan 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://oschepkov.ru/tags/index.xml" rel="self" type="application/rss+xml"/><item><title>tech</title><link>https://oschepkov.ru/tags/tech/</link><pubDate>Sun, 20 Jan 2019 00:00:00 +0000</pubDate><guid>https://oschepkov.ru/tags/tech/</guid><description/></item><item><title>tutorial</title><link>https://oschepkov.ru/tags/tutorial/</link><pubDate>Sun, 20 Jan 2019 00:00:00 +0000</pubDate><guid>https://oschepkov.ru/tags/tutorial/</guid><description/></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Ivan&#39;s Homepage</title>
+    <link>https://oschepkov.ru/tags/</link>
+    <description>Recent content in Tags on Ivan&#39;s Homepage</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language><atom:link href="https://oschepkov.ru/tags/index.xml" rel="self" type="application/rss+xml" />
+  </channel>
+</rss>

@@ -1,1 +1,29 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml"><url><loc>https://oschepkov.ru/posts/how-to-install-hugo/</loc><lastmod>2019-01-20T00:00:00+00:00</lastmod></url><url><loc>https://oschepkov.ru/series/hugo/</loc><lastmod>2019-01-20T00:00:00+00:00</lastmod></url><url><loc>https://oschepkov.ru/</loc><lastmod>2019-01-20T00:00:00+00:00</lastmod></url><url><loc>https://oschepkov.ru/posts/</loc><lastmod>2019-01-20T00:00:00+00:00</lastmod></url><url><loc>https://oschepkov.ru/series/</loc><lastmod>2019-01-20T00:00:00+00:00</lastmod></url><url><loc>https://oschepkov.ru/tags/</loc><lastmod>2019-01-20T00:00:00+00:00</lastmod></url><url><loc>https://oschepkov.ru/tags/tech/</loc><lastmod>2019-01-20T00:00:00+00:00</lastmod></url><url><loc>https://oschepkov.ru/series/theme/</loc><lastmod>2019-01-20T00:00:00+00:00</lastmod></url><url><loc>https://oschepkov.ru/posts/theme-demo/</loc><lastmod>2019-01-20T00:00:00+00:00</lastmod></url><url><loc>https://oschepkov.ru/tags/tutorial/</loc><lastmod>2019-01-20T00:00:00+00:00</lastmod></url><url><loc>https://oschepkov.ru/categories/</loc></url><url><loc>https://oschepkov.ru/about/</loc></url><url><loc>https://oschepkov.ru/projects/</loc></url></urlset>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>https://oschepkov.ru/categories/</loc>
+  </url>
+  
+  <url>
+    <loc>https://oschepkov.ru/about/</loc>
+  </url>
+  
+  <url>
+    <loc>https://oschepkov.ru/</loc>
+  </url>
+  
+  <url>
+    <loc>https://oschepkov.ru/projects/</loc>
+  </url>
+  
+  <url>
+    <loc>https://oschepkov.ru/series/</loc>
+  </url>
+  
+  <url>
+    <loc>https://oschepkov.ru/tags/</loc>
+  </url>
+  
+</urlset>
