@@ -49,8 +49,26 @@
 	<h4>Dealing with Django</h4>
 	<p>It is time to write some code.</p>
 	<pre><code>
+		#app/health/views.py
 
+		from django.http import JsonResponse
+		from django.views import View
+
+
+		class Check(View):
+    		def get(self, request, *args, **kwargs):
+        		return JsonResponse({"status": "online"})
 	</pre></code>
+	<pre><code>
+		#app/app/urls.py
+
+		from django.urls import path
+		from health.views import Check
+
+		urlpatterns = [
+    		path("health/", Check.as_view()),
+		]
+	</code></pre>
 	</section>
 	</article>
 </main>
