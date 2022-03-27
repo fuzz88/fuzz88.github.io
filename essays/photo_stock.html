@@ -40,7 +40,7 @@
 	<p>Let's create 2-node setup, each node with 2 cores of cpu and 3 gb of memory:</p>
 	<p>
 	<pre><code>
-	minikube start --nodes 2 --cpus=2 --memory=3gb
+minikube start --nodes 2 --cpus=2 --memory=3gb
 	</code></pre>
 	</p>
 	<p>That's it! Like a charm. Now you have kubectl configured to work with your cluster. Nice.</p>
@@ -49,39 +49,39 @@
 	<h4>Dealing with Django</h4>
 	<p>It is time to write some code.</p>
 	<pre><code>
-	#app/health/views.py
+#app/health/views.py
 
-	from django.http import JsonResponse
-	from django.views import View
+from django.http import JsonResponse
+from django.views import View
 
 
-	class Check(View):
-    	    def get(self, request, *args, **kwargs):
-       	        return JsonResponse({"status": "online"})
+class Check(View):
+    def get(self, request, *args, **kwargs):
+        return JsonResponse({"status": "online"})
 	</pre></code>
 	<pre><code>
-	#app/app/urls.py
+#app/app/urls.py
 
-	from django.urls import path
-	from health.views import Check
+from django.urls import path
+from health.views import Check
 
-	urlpatterns = [
-    	    path("health/", Check.as_view()),
-	]
+urlpatterns = [
+    path("health/", Check.as_view()),
+]
 	</code></pre>
 	<pre><code>
-	import json
+import json
 
-	from django.test import TestCase
-	from django.test import Client
+from django.test import TestCase
+from django.test import Client
 	
-	class TestHealthCheck(TestCase):
-		def setUp(self):
-			self.c = Client()
+class TestHealthCheck(TestCase):
+    def setUp(self):
+	self.c = Client()
 	
-		def test_is_service_online_route(self):
-			resp = self.c.get("/health/")
-			self.assertEquals(json.loads(resp.content), {"status": "online"})
+    def test_is_service_online_route(self):
+	resp = self.c.get("/health/")
+	self.assertEquals(json.loads(resp.content), {"status": "online"})
 	</code></pre>
 	<p>As you can see I created django project named <i>app</i> and project`s application named <i>health</i>. </p>
 	<p><i>health</i> app implements api endpoint for deployment healthcheck. It means that k8s will periodically query this endpoint to ensure that django application is still alive and responding well.</p>
