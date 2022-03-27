@@ -27,9 +27,10 @@
 <main>
 	<article>
 	<h4>Introduction</h4>
-	<p>It's not a tutorial that covers the described topics in an excess way. It is actually small and simple HOWTO that fixates couple of nice but controversial ideas in the area of my subtle Django experiences.</p>	
+	<small><i><p>It's not a tutorial that covers the described topics in an excess way. It is actually small and simple HOWTO that fixates couple of nice but controversial ideas in the area of my subtle Django experiences.</p>	</i></small>
 <p>Today I want to show you how to make extremely simple telegram bot using <a>Nginx</a> as SSL-proxy, <a href="https://docs.djangoproject.com/en/4.0/intro/overview">Django</a> as API framework, and <a href="https://minikube.sigs.k8s.io/docs/start">minikube</a> as local development multinode Kubernetes cluster.</p>
 	<p>These tools have clean and complete documentation, so I don't take task to delve into the advanced or complex features. Just a bit of code and comments. Let's go.
+
 	<section>
 	<h4>Bootstraping kubernetes</h4>
 	<p>Once upon a time I was wondering switching browsing tabs trying to figure out which instant k8s cluster to use for local development.</p>
@@ -37,7 +38,7 @@
 	<p>But finally I was drained and didn't get working cluster setup. So I moved on.</p>
 	<p>MicroK8s looked promising, but it just didn't work for me. I think I am really grasp and like these nice IoT ideas behind MicroK8s with dqlite and prod-ready battaries, but on my virtualbox vm's it demands some virtual bridge adapters tuning and I decided to find something more canonical.</p>
 	<p>The next option and the option on which I decided to stay is minikube. It's vendor recommended and so much easy to use. And I had no problems running it at all.</p>
-	<p>Let's create 2-node setup, each node with 2 cores of cpu and 3 gb of memory:</p>
+	<p>Let's create dual-node setup with 2 cores of cpu and 3 gb of memory each:</p>
 	<p>
 	<pre><code>
 minikube start --nodes 2 --cpus=2 --memory=3gb
@@ -88,7 +89,25 @@ class TestHealthCheck(TestCase):
 	<p><i>health</i> app implements api endpoint for deployment healthcheck. It means that k8s will periodically query this endpoint to ensure that django application is still alive and responding well.</p>
 	</section>
 
-	<p>Ok. We have k8s running and
+	<section>
+	<h4>Naming first</h4>
+	<p>It is time to reveal the project name and some specifications, isn't it? :-)</p>
+	<p>Ok. Whole project named PhotoStock and, as you already know, it is yet another telegram bot:
+	<ol>
+	<li>It gets updates from telegram api by webhook, waiting for photos.</li>
+	<li>It saves photos into database.</li>
+	<li>It serves received photos as html page.</li>
+	</ol>
+	</p>
+	<p>Now, from the list above, we see, that we've got to write implementation of two apps: the first one, let's name it <i>telegram_bot</i> and the second one, let's name it <i>photos</i>.</p>
+	<p>Both will deal with photo data: <i>telegram_bot</i> will receive it from telegram api and save, <i>photos</i> will convert it into formatted form and give it out to client.</p> 
+	<p>As we didn't deploy any database server within the cluster, we will use sqlite3 database enabled in Django by default. Hence our application will be <i>stateful</i>.</p>
+	<p>But we will kill two birds with one stone and deploy it as <i>stateless</i>. It is simpler, takes less time, and you can learn by example that stateful app deployed as stateless will loose data on restart or update.</p>
+	</section>
+	<section>
+	<h4>Flawing design</h4>
+	<p></p>
+	</section>
 	</article>
 </main>
 </body>
