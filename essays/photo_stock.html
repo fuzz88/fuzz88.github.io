@@ -13,44 +13,43 @@
 </head>
 <body>
 <header>
-	<h1>Ivan Oschepkov</h1>
-	<p><i>homepage with useful links</i></p>
-	<nav>
-		<ul>
-			<li><a href="/index.html">***</a></li>
-			<li><a href="/reading.html">Reading</a></li>
-            		<li><a href="/writing.html">Writing</a></li>
-            		<li><a href="/resume.html">Resume</a></li>
-		</ul>
-	</nav>
+    <h1>Ivan Oschepkov</h1>
+    <p><i>homepage with useful links</i></p>
+    <nav>
+        <ul>
+            <li><a href="/index.html">***</a></li>
+            <li><a href="/reading.html">Reading</a></li>
+                    <li><a href="/writing.html">Writing</a></li>
+                    <li><a href="/resume.html">Resume</a></li>
+        </ul>
+    </nav>
 </header>
 <main>
-	<article>
-	<h4>Introduction</h4>
-	<small><i><p>It's not a tutorial that covers the described topics in an excess way. It is actually small and simple HOWTO that fixates couple of nice but controversial ideas in the area of my subtle Django experiences.</p>	</i></small>
+    <article>
+    <h4>Introduction</h4>
+    <small><i><p>It's not a tutorial that covers the described topics in an excess way. It is actually small and simple HOWTO that fixates couple of nice but controversial ideas in the area of my subtle Django experiences.</p>	</i></small>
 <p>Today I want to show you how to make extremely simple telegram bot using <a>Nginx</a> as SSL-proxy, <a href="https://docs.djangoproject.com/en/4.0/intro/overview">Django</a> as API framework, and <a href="https://minikube.sigs.k8s.io/docs/start">minikube</a> as local development multinode Kubernetes cluster.</p>
-	<p>These tools have clean and complete documentation, so I don't take task to delve into the advanced or complex features. Just a bit of code and comments. Let's go.
+    <p>These tools have clean and complete documentation, so I don't take task to delve into the advanced or complex features. Just a bit of code and comments. Let's go.
 
-	<section>
-	<h4>Bootstraping kubernetes</h4>
-	<p>Once upon a time I was wondering switching browsing tabs trying to figure out which instant k8s cluster to use for local development.</p>
-	<p>For a long and exciting couple of days I was encompassed with vagrant, ansible and kubeadm, and it become obvious that I was loosing the battle. Neither Calico nor flunnel wont connect the nodes the way I wanted. I had a strong feeling that I was on the right way by the moment I begun to comprehend how k8s internal components interacting with each other and how it may be tuned with kube-proxy settings.</p>
-	<p>But finally I was drained and didn't get working cluster setup. So I moved on.</p>
-	<p>MicroK8s looked promising, but it just didn't work for me. I think I am really grasp and like these nice IoT ideas behind MicroK8s with dqlite and prod-ready battaries, but on my virtualbox vm's it demands some virtual bridge adapters tuning and I decided to find something more canonical.</p>
-	<p>The next option and the option on which I decided to stay is minikube. It's vendor recommended and so much easy to use. And I had no problems running it at all.</p>
-	<p>Let's create dual-node setup with 2 cores of cpu and 3 gb of memory each:</p>
-	<p>
-	<pre><code>
+    <section>
+    <h4>Bootstraping kubernetes</h4>
+    <p>Once upon a time I was wandering switching browsing tabs trying to figure out which instant k8s cluster to use for local development.</p>
+    <p>For a long and exciting couple of days I was encompassed with vagrant, ansible and kubeadm, and it become obvious that I was loosing the battle. Neither Calico nor flunnel wont connect the nodes the way I wanted. I had a strong feeling that I was on the right way by the moment I begun to comprehend how k8s internal components interacting with each other and how it may be tuned with kube-proxy settings.</p>
+    <p>But finally I was drained and didn't get working cluster setup. So I moved on.</p>
+    <p>MicroK8s looked promising, but it just didn't work for me. I think I am really grasp and like these nice IoT ideas behind MicroK8s with dqlite and prod-ready battaries, but on my virtualbox vm's it demands some virtual bridge adapters tuning and I decided to find something more canonical.</p>
+    <p>The next option and the option on which I decided to stay is minikube. It's vendor recommended and so much easy to use. And I had no problems running it at all.</p>
+    <p>Let's create dual-node setup with 2 cores of cpu and 3 gb of memory each:</p>
+    <p>
+    <pre><code>
 minikube start --nodes 2 --cpus=2 --memory=3gb
-	</code></pre>
-	</p>
-	<p>That's it! Like a charm. Now you have kubectl configured to work with your cluster. Nice.</p>
-	</section>
-	<section>
-	<h4>Dealing with Django</h4>
-	<p>It is time to write some code.</p>
-	<pre><code>
-#app/health/views.py
+    </code></pre>
+    </p>
+    <p>That's it! Like a charm. Now you have kubectl configured to work with your cluster. Nice.</p>
+    </section>
+    <section>
+    <h4>Dealing with Django</h4>
+    <p>It is time to write some code.</p>
+    <pre><code>#app/health/views.py
 
 from django.http import JsonResponse
 from django.views import View
@@ -59,9 +58,8 @@ from django.views import View
 class Check(View):
     def get(self, request, *args, **kwargs):
         return JsonResponse({"status": "online"})
-	</pre></code>
-	<pre><code>
-#app/app/urls.py
+    </pre></code>
+    <pre><code>#app/app/urls.py
 
 from django.urls import path
 from health.views import Check
@@ -69,46 +67,182 @@ from health.views import Check
 urlpatterns = [
     path("health/", Check.as_view()),
 ]
-	</code></pre>
-	<pre><code>
-#app/health/tests.py
+    </code></pre>
+    <pre><code>#app/health/tests.py
 import json
 
 from django.test import TestCase
 from django.test import Client
-	
+    
 class TestHealthCheck(TestCase):
     def setUp(self):
-	self.c = Client()
-	
+    self.c = Client()
+    
     def test_is_service_online_route(self):
-	resp = self.c.get("/health/")
-	self.assertEquals(json.loads(resp.content), {"status": "online"})
-	</code></pre>
-	<p>As you can see I created django project named <i>app</i> and project`s application named <i>health</i>. </p>
-	<p><i>health</i> app implements api endpoint for deployment healthcheck. It means that k8s will periodically query this endpoint to ensure that django application is still alive and responding well.</p>
-	</section>
+    resp = self.c.get("/health/")
+    self.assertEquals(json.loads(resp.content), {"status": "online"})
+    </code></pre>
+    <p>As you can see I created django project named <i>app</i> and project`s application named <i>health</i>. </p>
+    <p><i>health</i> app implements api endpoint for deployment healthcheck. It means that k8s will periodically query this endpoint to ensure that django application is still alive and responding well.</p>
+    </section>
 
-	<section>
-	<h4>Naming first</h4>
-	<p>It is time to reveal the project name and some specifications, isn't it? :-)</p>
-	<p>Ok. Whole project named PhotoStock and, as you already know, it is yet another telegram bot:
-	<ol>
-	<li>It gets updates from telegram api by webhook, waiting for photos.</li>
-	<li>It saves photos into database.</li>
-	<li>It serves received photos as html page.</li>
-	</ol>
-	</p>
-	<p>Now, from the list above, we see, that we've got to write implementation of two apps: the first one, let's name it <i>telegram_bot</i> and the second one, let's name it <i>photos</i>.</p>
-	<p>Both will deal with photo data: <i>telegram_bot</i> will receive it from telegram api and save, <i>photos</i> will convert it into formatted form and give it out to client.</p> 
-	<p>As we didn't deploy any database server within the cluster, we will use sqlite3 database enabled in Django by default. Hence our application will be <i>stateful</i>.</p>
-	<p>But we will kill two birds with one stone and deploy it as <i>stateless</i>. It is simpler, takes less time, and you can learn by example that stateful app deployed as stateless will loose data on restart or update.</p>
-	</section>
-	<section>
-	<h4>Flawing design</h4>
-	<p></p>
-	</section>
-	</article>
+    <section>
+    <h4>Naming first</h4>
+    <p>It is time to reveal the project name and some specifications, isn't it? :-)</p>
+    <p>Ok. Whole project named PhotoStock and, as you already know, it is yet another telegram bot:
+    <ol>
+    <li>It gets updates from telegram api by webhook, waiting for photos.</li>
+    <li>It saves photos into database.</li>
+    <li>It serves received photos as html page.</li>
+    </ol>
+    </p>
+    <p>Now, from the list above, we see, that we've got to write implementation of two apps: the first one, let's name it <i>telegram_bot</i> and the second one, let's name it <i>photos</i>.</p>
+    <p>Both will deal with photo data: <i>telegram_bot</i> will receive it from telegram api and save, <i>photos</i> will convert it into formatted form and give it out to client.</p> 
+    <p>As we didn't deploy any database server within the cluster, we will use sqlite3 database enabled in Django by default. Hence our application will be <i>stateful</i>.</p>
+    <p>But we will kill two birds with one stone and deploy it as <i>stateless</i>. It is simpler, takes less time, and you can learn by example that stateful app deployed as stateless will loose data on restart or update.</p>
+    </section>
+    <section>
+    <h4>Flawing design</h4>
+    <p>The central idea here is to maintain two separate Django ORM models. The source table of the models will be the same.</p>
+    <p>Let's look at this:</p>
+    <pre><code class="language-python">#app/telegram_bot/models.py
+
+import json
+import os
+import logging
+
+import django.dispatch
+import requests
+from django.db import models
+
+
+logger = logging.getLogger("uploaded_photo")
+
+
+class UploadedPhoto(models.Model):
+    file_name = models.CharField(max_length=255, null=False)
+    file_data = models.BinaryField(null=False)
+    description = models.TextField(null=False, default="")
+
+    class Meta:
+        db_table = "photos"
+        managed = False
+
+    on_new_photo = django.dispatch.Signal()
+
+    @staticmethod
+    def download_binary(file_id) -> bytes:
+        try:
+            bot_token = os.environ["BOT_TOKEN"]
+            resp = requests.get(
+                f"https://api.telegram.org/bot{bot_token}/getFile?file_id={file_id}"
+            )
+            file_path = json.loads(resp.content).get("result").get("file_path")
+            return requests.get(
+                f"https://api.telegram.org/file/bot{bot_token}/{file_path}"
+            ).content
+        except Exception as e:
+            logger.exception(e)
+    </code></pre>
+    <p><i>telegram_bot</i> has ORM data layer with migrations turned off due to conflicts between models with shared source of data.</p>
+    <p>It can retrieve image data from telegram api. It can save that data into database since the layer is Django ORM model.</p>
+    <p>It provides <i>on_new_photo</i> signal outside, and you can be subscribed on this signal from any place of this Django monolith, e.g. from the sibling model.</p>
+    <p>The signal is triggered outside the model. It is not a bug, it is a feature.</p>
+    <p>There you can see the act of another model subscription:</p>
+    <pre><code class="language-python">#app/photos/models.py
+
+import base64
+from django.db import models
+from telegram_bot.models import UploadedPhoto
+
+
+class UserPhoto(models.Model):
+    file_name = models.CharField(max_length=255, null=False)
+    file_data = models.BinaryField(null=False)
+    description = models.TextField(null=False, default="")
+    base64 = models.TextField(null=True)
+
+    class Meta:
+        db_table = "photos"
+        managed = True
+
+    @staticmethod
+    def convert_base64(sender: UploadedPhoto, **kwargs):
+        UserPhoto.objects.filter(file_name=sender.file_name).update(
+            base64=base64.b64encode(sender.file_data).decode("UTF-8")
+        )
+
+
+UploadedPhoto.on_new_photo.connect(UserPhoto.convert_base64)
+    </code></pre>
+    <p><i>photos</i> data model is primary, since it is larger, and has additional (in compare to <i>UploadedPhoto</i>) data fields. To be precise - the only one additional field to store base64-encoded image data.</p>
+    <p>Why base64?</p>
+    <p>The trick I will use there is to inject images into HTML page to simplify photo serving.</p>
+    <p>We don't have isolated frontend service with data representation, so I want to avoid serving static files with Django or putting image data on some external service as nginx folder.</p>
+    <p>Let's look to our webhook:</p>
+    <pre><code class="language-python">#app/telegram_bot/views.py
+
+import json
+import logging
+
+from django.http import HttpResponse
+from django.views import View
+
+from telegram_bot.models import UploadedPhoto
+
+logger = logging.getLogger("web_hook")
+
+
+class WebHook(View):
+    def post(self, request, *args, **kwargs):
+        try:
+            photo = json.loads(request.body).get("message").get("photo")
+            match photo:
+                case None:
+                    pass
+                case photo:
+                    file_id = photo[0].get("file_id")
+                    saved = UploadedPhoto.objects.create(
+                        file_name=file_id,
+                        file_data=UploadedPhoto.download_binary(file_id),
+                    )
+                    UploadedPhoto.on_new_photo.send(saved)
+        except Exception as e:
+            logger.exception(e)
+        finally:
+            return HttpResponse(status=200)
+    </code></pre>
+    <p>We receive update from telegram api. Then trying to parse it and download image file. If success is reached without exceptions <i>on_new_photo</i> signal will be fired up.</p>
+    <p>Anyway we return HTTP Status OK to telegram api, because this code will faults on any update except photo message.</p>
+    <p>It's one of design flaws and a bad practice, but we are having fun and <abbr title="rapid application developing">RADing</abbr>.</p>
+    <p>And the last piece of code I wanted to show you is endpoint which serves photos:</p>
+    <pre><code class="language-python">#app/photos/views.py
+
+from django.shortcuts import render
+from django.views import View
+
+from photos.models import UserPhoto
+
+
+class Photos(View):
+    def get(self, request, *args, **kwargs):
+        encoded_photos = UserPhoto.objects.filter(base64__isnull=False).values_list(
+            "base64"
+        )
+        return render(
+            request,
+            "feed.template",
+            {"images": [data[0] for data in encoded_photos]},
+        )
+    </code></pre>
+    </section>
+    </article>
+
+    <section>
+    <h4>Deploying stuff</h4>
+    <p><a href="https://gaps-apps.ru/8a38b116132722eef2113a21aef23a19/photos/">It is harder to describe by the moment than to implement.</a></p>
+    <p></p>
+    </section>
 </main>
 </body>
 </html>
