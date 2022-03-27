@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>PhotoStock App. Ivan's Homepage</title>
+<link rel="stylesheet" href="/assets/css/awsm.min.css">
+<link rel="stylesheet" href="/assets/highlight/styles/night-owl.min.css">
+
+<script src="/assets/highlight/highlight.min.js"></script>
+<script> hljs.highlightAll();</script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</style>
+</head>
+<body>
+<header>
+	<h1>Ivan Oschepkov</h1>
+	<p><i>homepage with useful links</i></p>
+	<nav>
+		<ul>
+			<li><a href="/index.html">***</a></li>
+			<li><a href="/reading.html">Reading</a></li>
+            		<li><a href="/writing.html">Writing</a></li>
+            		<li><a href="/resume.html">Resume</a></li>
+		</ul>
+	</nav>
+</header>
+<main>
+	<article>
+	<h4>Introduction</h4>
+	<p>It's not a tutorial that covers the described topics in an excess way. It is actually small and simple HOWTO that fixates couple of nice but controversial ideas in the area of my subtle Django experiences.</p>	
+<p>Today I want to show you how to make extremely simple telegram bot using <a>Nginx</a> as SSL-proxy, <a href="https://docs.djangoproject.com/en/4.0/intro/overview">Django</a> as API framework, and <a href="https://minikube.sigs.k8s.io/docs/start">minikube</a> as local development multinode Kubernetes cluster.</p>
+	<p>These tools have clean and complete documentation, so I don't take task to delve into the advanced or complex features. Just a bit of code and comments. Let's go.
+	<section>
+	<h4>Bootstraping kubernetes</h4>
+	<p>Once upon a time I was wondering switching browsing tabs trying to figure out which instant k8s cluster to use for local development.</p>
+	<p>For a long and exciting couple of days I was encompassed with vagrant, ansible and kubeadm, and it become obvious that I was loosing the battle. Neither Calico nor flunnel wont connect the nodes the way I wanted. I had a strong feeling that I was on the right way by the moment I begun to comprehend how k8s internal components interacting with each other and how it may be tuned with kube-proxy settings.</p>
+	<p>But finally I was drained and didn't get working cluster setup. So I moved on.</p>
+	<p>MicroK8s looked promising, but it just didn't work for me. I think I am really grasp and like these nice IoT ideas behind MicroK8s with dqlite and prod-ready battaries, but on my virtualbox vm's it demands some virtual bridge adapters tuning and I decided to find something more canonical.</p>
+	<p>The next option and the option on which I decided to stay is minikube. It's vendor recommended and so much easy to use. And I had no problems running it at all.</p>
+	<p>Let's create 2-node setup, each node with 2 cores of cpu and 3 gb of memory:</p>
+	<p>
+	<pre><code>
+	minikube start --nodes 2 --cpus=2 --memory=3gb
+	</code></pre>
+	</p>
+	<p>That's it! Like a charm. Now you have kubectl configured to work with your cluster. Nice.</p>
+	</section>
+	<section>
+	<h4>Dealing with Django</h4>
+	<p>It is time to write some code.</p>
+	<pre><code>
+
+	</pre></code>
+	</section>
+	</article>
+</main>
+</body>
+</html>
