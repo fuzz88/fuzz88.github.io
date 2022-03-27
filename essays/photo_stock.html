@@ -69,6 +69,20 @@
     	    path("health/", Check.as_view()),
 	]
 	</code></pre>
+	<pre><code>
+	import json
+
+	from django.test import TestCase
+	from django.test import Client
+	
+	class TestHealthCheck(TestCase):
+		def setUp(self):
+			self.c = Client()
+	
+		def test_is_service_online_route(self):
+			resp = self.c.get("/health/")
+			self.assertEquals(json.loads(resp.content), {"status": "online"})
+	</code></pre>
 	<p>As you can see I created django project named <i>app</i> and project`s application named <i>health</i>. </p>
 	<p><i>health</i> app implements api endpoint for deployment healthcheck. It means that k8s will periodically query this endpoint to ensure that django application is still alive and responding well.</p>
 	</section>
