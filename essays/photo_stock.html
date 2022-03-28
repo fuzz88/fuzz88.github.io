@@ -6,6 +6,10 @@
 <link rel="stylesheet" href="/assets/highlight/styles/night-owl.min.css">
 
 <script src="/assets/highlight/highlight.min.js"></script>
+<script src="/assets/highlight/languages/xml.min.js"></script>
+<script src="/assets/highlight/languages/dockerfile.min.js"></script>
+<script src="/assets/highlight/languages/bash.min.js"></script>
+<script src="/assets/highlight/languages/yaml.min.js"></script>
 <script> hljs.highlightAll();</script>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,8 +23,8 @@
         <ul>
             <li><a href="/index.html">***</a></li>
             <li><a href="/reading.html">Reading</a></li>
-                    <li><a href="/writing.html">Writing</a></li>
-                    <li><a href="/resume.html">Resume</a></li>
+            <li><a href="/writing.html">Writing</a></li>
+            <li><a href="/resume.html">Resume</a></li>
         </ul>
     </nav>
 </header>
@@ -69,6 +73,7 @@ urlpatterns = [
 ]
     </code></pre>
     <pre><code>#app/health/tests.py
+
 import json
 
 from django.test import TestCase
@@ -103,7 +108,7 @@ class TestHealthCheck(TestCase):
     </section>
     <section>
     <h4>Flawing design</h4>
-    <p>The central idea and purpose of this POC is to maintain two separate Django ORM models on the top of one source database table.</p>
+    <p>The central idea and purpose of this proof of concept is to maintain two separate orm models on the top of one source database table.</p>
     <p>Let's look at this:</p>
     <pre><code class="language-python">#app/telegram_bot/models.py
 
@@ -144,11 +149,11 @@ class UploadedPhoto(models.Model):
         except Exception as e:
             logger.exception(e)
     </code></pre>
-    <p><i>telegram_bot</i> has ORM data layer with migrations turned off due to conflicts between models with shared source of data.</p>
-    <p>It can retrieve image data from telegram api. It can save that data into database since the layer is Django ORM model.</p>
-    <p>It provides <i>on_new_photo</i> signal outside, and you can be subscribed on this signal from any place of this Django monolith, e.g. from the sibling model.</p>
-    <p>The signal is triggered outside the model. It is not a bug, it is a feature.</p>
-    <p>There you can see the act of another model subscription:</p>
+    <p><i>telegram_bot</i> has it own secondary data layer with migrations turned off due to conflicts between models with shared source of data.</p>
+    <p>This layer can retrieve image data from telegram api. It can save that data into database since the layer is Django ORM model.</p>
+    <p>It provides <i>on_new_photo</i> signal outside, so we can be subscribed for this signal from anywhere, e.g. from the sibling model.</p>
+    <p>For example, the signal is triggered outside the model in our webhook. It is not a bug, it is a feature. We also attach data with signal beeing sent.</p>
+    <p>Next. Primary data model (saying "primary" I mean "with enabled migrations" basically):</p>
     <pre><code class="language-python">#app/photos/models.py
 
 import base64
@@ -177,9 +182,9 @@ UploadedPhoto.on_new_photo.connect(UserPhoto.convert_base64)
     </code></pre>
     <p><i>photos</i> data model is primary, since it is larger, and has additional (in compare to <i>UploadedPhoto</i>) data fields. To be precise - the only one additional field to store base64-encoded image data.</p>
     <p>Why base64?</p>
-    <p>The trick I will use there is to inject images into HTML page to simplify photo serving.</p>
+    <p>The trick I will use is to have images injected into HTML page as base64 encoded strings to simplify photo serving.</p>
     <p>We don't have isolated frontend service with data representation, so I want to avoid serving static files with Django or putting image data on some external service as nginx folder.</p>
-    <p>Let's look to our webhook:</p>
+    <p>Webhook:</p>
     <pre><code class="language-python">#app/telegram_bot/views.py
 
 import json
@@ -212,10 +217,9 @@ class WebHook(View):
         finally:
             return HttpResponse(status=200)
     </code></pre>
-    <p>We receive update from telegram api. Then trying to parse it and download image file. If success is reached without exceptions <i>on_new_photo</i> signal will be fired up.</p>
-    <p>Anyway we return HTTP Status OK to telegram api, because this code will faults on any update except photo message.</p>
-    <p>It's one of design flaws and a bad practice, but we are having fun and <abbr title="rapid application developing">RADing</abbr>.</p>
-    <p>And the last piece of code I wanted to show you is endpoint which serves photos:</p>
+    <p>Here we receive update from telegram api in a form of HTTP POST query. Then we are trying to parse it and, in case of success, to download image file. If the end of routine is reached out without exceptions, <i>on_new_photo</i> signal will be fired up.</p>
+    <p>We will always return HTTP status "200 OK" back to Telegram API. 
+    <p>This is how we render feed.template with base64-encoded images:</p>
     <pre><code class="language-python">#app/photos/views.py
 
 from django.shortcuts import render
@@ -235,29 +239,130 @@ class Photos(View):
             {"images": [data[0] for data in encoded_photos]},
         )
     </code></pre>
-    </section>
-    </article>
+    <p>And the last frontier -- frontend template:</p>
+    <pre><code class="language-xml"><xmp><!-- app/photos/templates/feed.template -->
 
+<!DOCTYPE html>
+<html>
+<head>
+<title>Photo Stock</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</style>
+</head>
+<body>
+<main>
+    {% for encoded_img in images %}
+    <article>
+        <img src="data:image/jpeg;base64,{{ encoded_img }}">
+    </article>
+    {% endfor %}
+</main>
+</body>
+</html>
+    </xmp></code></pre>
+    </section>
     <section>
     <h4>Deploying stuff</h4>
-    <p><a href="https://gaps-apps.ru/8a38b116132722eef2113a21aef23a19/photos/">It is harder to describe by the moment than to implement.</a></p>
-    <p>Check out this meme about honeypot and Winnie The Pooh.</p>
-    </section>
+    <p>As application will be deployed to k8s, we have to conteinerize it. Docker is a default option:</p>
+    <pre><code class="language-docker">#Dockerfile
+
+FROM python:3.10-bullseye
+
+LABEL maintainer="fuzz88"
+
+COPY requirements.txt /opt/
+
+RUN pip install --no-cache-dir -r /opt/requirements.txt
+
+COPY app/ /opt/app/
+COPY entrypoint.sh /opt/
+
+EXPOSE 8081
+
+CMD ["sh", "/opt/entrypoint.sh"]
+    </code></pre>
+    <p>It is wrong not to use uvicorn, gunicorn, supervisord, but let's keep entrypoint.sh simple:</p>
+    <pre><code class="language-bash">#entrypoint.sh
+ 
+#!/bin/bash
+python /opt/app/manage.py runserver 0.0.0.0:8081
+    </code></pre>
+    <p>Don't forget to tag the image on build:</p>
+    <pre><code class="language-bash">#build.sh
+
+#!/bin/bash
+sudo docker build -t your_registry/photo_stock:latest .
+sudo docker push your_registry/photo_stock:latest
+    </code></pre>
+    <p>Let's create k8s Secret in order to link it with BOT_TOKEN environment variable in the Pod.</p>
+    <p>But before let's describe our Pod:</p>
+    <pre><code class="language-yaml">#deployment/pod.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+    name: photo-stock
+    labels:  
+    app: photo-stock
+spec:
+    containers:
+    - name: photo-stock
+        image: "your_registry/photo_stock:latest"
+        env:
+        - name: BOT_TOKEN
+            valueFrom:
+            secretKeyRef:
+                name: photo-stock
+                key: BOT_TOKEN
+                optional: false
+    </code></pre>
+    <p>Then the Secret:</p>
+    <pre><code class="language-bash">
+[fuzz@workstation my_k8s]$ kubectl create secret generic photo-stock --from-literal=BOT_TOKEN=123123123:AAEi3fDLxSY
+secret/photo-stock created
+    </code></pre>
+    <p>Next step is to run the Pod:</p>
+    <pre><code class="language-bash">
+(photo_Stock) [fuzz@workstation photo_stock]$ kubectl apply -f deployment/pod.yaml 
+pod/photo-stock created
+    </code></pre>
+    <p>And expose the HTTP port via Service:</p>
+    <pre><code class="language-bash">
+[fuzz@workstation my_k8s]$ kubectl expose pod photo-stock --port 8081 --type=NodePort --name photo-stock
+service/photo-stock exposed
+
+[fuzz@workstation my_k8s]$ minikube service --all
+😿  service default/kubernetes has no node port
+😿  service default/redis-leader has no node port
+|-----------|--------------|--------------|-----------------------------|
+| NAMESPACE |     NAME     | TARGET PORT  |             URL             |
+|-----------|--------------|--------------|-----------------------------|
+| default   | hello-node   |         8080 | http://192.168.38.101:31702 |
+| default   | kubernetes   | No node port |
+| default   | photo-stock  |         8081 | http://192.168.38.101:32225 |
+| default   | redis-leader | No node port |
+|-----------|--------------|--------------|-----------------------------|
+    </code></pre>
+    <p>Setting the Webhook is the homework, guys.</p>
+    <p>Also I decided to skip description of the process of setting up Nginx as reverse proxy with Let's Encrypt free ssl certificate, because it is really the easiest and widely well-described part of this deploy.</p>
+    <p><a href="https://gaps-apps.ru/8a38b116132722eef2113a21aef23a19/photos/">Check out this honeypot.</a><small><i>(There is a feed with photos from bot below).</i></small></p>
+    <p>Bot available at <b>@photostokk_bot</b></p>    
+</section>
     <section>
     <h4>Summarizing this</h4>
     <p>This article is experiment itself.</p>
     <p>So don't dare to judge me. :-)</p>
     <p>And don't take it serious.</p>
-    <p>I was trying hard to design, implement and describe this proof of concept in one day, but it took almoust three.</p>
-    <p>Kubernetes still needs to be learned (no wonder). Setting myself to write in english is tricky at first.</p>
+    <p>I was trying hard to design, implement and describe this proof of concept in one day, but it took almost three.</p>
+    <p>Kubernetes still needs to be learned deeper (no wonder). Setting myself to write in english is tricky at first.</p>
     <p>Text demands spellchecking, editing and rewriting, but still первый блин комом.</p>
     <p>Hope you are not bored to death.</p>
     <p>All this project was inspired by my studing of CQRS at the fall of 2021. Separate databases, separate datasources, separate read and writing, you know.</p>
-    <p>And now is when dealine comes.</p>
+    <p>And now is when deadline comes.</p>
 
-    <p>Stay tuned!</p>
-    
+    <p>Stay tuned!</p>    
     </section>
+    </article>
 </main>
 </body>
 </html>
