@@ -10,6 +10,7 @@
 <script src="/assets/highlight/languages/dockerfile.min.js"></script>
 <script src="/assets/highlight/languages/bash.min.js"></script>
 <script src="/assets/highlight/languages/yaml.min.js"></script>
+<script src="/assets/highlight/languages/nginx.min.js"></script>
 <script> hljs.highlightAll();</script>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,7 +33,7 @@
     <article>
     <h4>Introduction</h4>
     <small><i><p>It's not a tutorial that covers the described topics in an excess way. It is actually small and simple HOWTO that fixates couple of nice but controversial ideas in the area of my subtle Django experiences.</p>	</i></small>
-<p>Today I want to show you how to make extremely simple telegram bot using <a>Nginx</a> as SSL-proxy, <a href="https://docs.djangoproject.com/en/4.0/intro/overview">Django</a> as API framework, and <a href="https://minikube.sigs.k8s.io/docs/start">minikube</a> as local development multinode Kubernetes cluster.</p>
+<p>Today I want to show you how to make extremely simple telegram bot using <a href="https://nginx.org/en/">Nginx</a> as SSL-proxy, <a href="https://docs.djangoproject.com/en/4.0/intro/overview">Django</a> as API framework, and <a href="https://minikube.sigs.k8s.io/docs/start">minikube</a> as local development multinode Kubernetes cluster.</p>
     <p>These tools have clean and complete documentation, so I don't take task to delve into the advanced or complex features. Just a bit of code and comments. Let's go.
 
     <section>
@@ -343,8 +344,45 @@ service/photo-stock exposed
 | default   | redis-leader | No node port |
 |-----------|--------------|--------------|-----------------------------|
     </code></pre>
-    <p>Setting the Webhook is the homework, guys.</p>
-    <p>Also I decided to skip description of the process of setting Nginx up as reverse proxy with Let's Encrypt free ssl certificate, because it is really the easiest and widely well-described part of this deploy.</p>
+    <p>Ok, we have link to access application's endpoints from gateway. The next step is to set nginx up as a gateway.</p>
+    <p>I assume that you already have got ssl certificates for your domain with <a href="https://certbot.eff.org/pages/about">Certbot.</a></p>
+    <pre><code class="language-nginx">#/etc/nginx/sites-enabled/gateway.conf
+
+server {
+    listen       443 ssl;
+    server_name  gaps-apps.ru;
+
+    ssl_certificate     /etc/nginx/ssl/fullchain.pem;
+    ssl_certificate_key /etc/nginx/ssl/privkey.pem;
+
+    keepalive_timeout   70;
+
+    location / {
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+    }
+
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+
+    location /8a38b116132722eef2113a21aef23a19/ {
+
+            proxy_pass http://192.168.38.101:32225/;
+    }
+
+}
+    </code></pre>
+    <p>As we have external url for bot, we can setup telegram api webhook by quering api.telegram.org</p>
+<pre><code>#tools/set_webhook.sh
+
+curl -v -k -X POST -H "Content-Type: application/json" -H "Cache-Control: no-cache"
+-d '{
+"url": "https://gaps-apps.ru/8a38b116132722eef2113a21aef23a19/webhook/"
+}'
+"https://api.telegram.org/bot{{token}}/setWebhook"
+</code></pre>
     <p><a href="https://gaps-apps.ru/8a38b116132722eef2113a21aef23a19/photos/">Check out this honeypot.</a><small><i>(There is a feed with photos from bot below).</i></small></p>
     <p>Bot available at <b>@photostokk_bot</b></p>    
 </section>
