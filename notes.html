@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Ivan's Homepage</title>
+<link rel="stylesheet" href="/assets/css/awsm.min.css">
+<link rel="stylesheet" href="/assets/highlight/styles/night-owl.min.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="/assets/highlight/highlight.min.js"></script>
+<script src="/assets/highlight/languages/nginx.min.js"></script>
+<script> hljs.highlightAll();</script>
+</head>
+<body>
+<header>
+	<h1>Ivan Oschepkov</h1>
+	<p><i>homepage with useful links</i></p>
+	<nav>
+		<ul>
+		<li><a href="/index.html">***</a></li>
+		<li>Notes</li>
+		<li><a href="/cv.html">CV</a></li>
+		</ul>
+	</nav>
+</header>
+<main>
+	<article>
+	<h5>Sat Mar 26 23:32:06 +08 2022</h5>
+	<p>The easiest way to startup local kubernetes cluster for development:</p>
+	<section>
+	<pre><code class="language-nginx">minikube start --nodes 2 --cpus=2 --memory=3gb</code></pre>
+	</p>
+	<p>That's it! Like a charm. Now you have kubectl configured to work with your cluster. Nice.</p>
+	</section>
+	</article>
+</main>
+</body>
+</html>
