@@ -1,4 +1,4 @@
 #!/bin/bash
 
 npm run build
-cp -rf ./public/* ../../cv
+cp -v -rf ./public/* ../../cv
